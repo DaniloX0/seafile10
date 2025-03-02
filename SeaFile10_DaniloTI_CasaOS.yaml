@@ -92,7 +92,7 @@ services:
     restart: unless-stopped
     volumes:
       - type: bind
-        source: /media/devmon/sdb2-ata-WDC_WD10SPZX-21Z/seafile
+        source: /media/devmon/caminho-para-seu-armazenamento
         target: /shared
     devices: []
     cap_add: []
