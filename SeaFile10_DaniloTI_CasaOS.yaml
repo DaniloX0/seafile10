@@ -1,0 +1,117 @@
+name: Seafile | youtube.com/@Danilo_TI
+services:
+  db:
+    cpu_shares: 90
+    command: []
+    container_name: seafile-mysql
+    deploy:
+      resources:
+        limits:
+          memory: 11705M
+    environment:
+      - MARIADB_AUTO_UPGRADE=1
+      - MYSQL_LOG_CONSOLE=true
+      - MYSQL_ROOT_PASSWORD=db_dev
+    hostname: seafile-mysql
+    image: mariadb:10.11
+    labels:
+      icon: https://manual.seafile.com/latest/media/seafile-transparent-1024.png
+    ports:
+      - target: 3306
+        published: "3306"
+        protocol: tcp
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: /opt/seafile-db
+        target: /var/lib/mysql
+    devices: []
+    cap_add: []
+    networks:
+      - seanet
+    privileged: false
+  memcached:
+    cpu_shares: 90
+    command: []
+    container_name: seafile-memcached
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    entrypoint:
+      - memcached
+      - -m
+      - "256"
+    hostname: seafile-memcached
+    image: memcached:1.6.18
+    labels:
+      icon: https://manual.seafile.com/latest/media/seafile-transparent-1024.png
+    restart: unless-stopped
+    ports: []
+    volumes: []
+    devices: []
+    cap_add: []
+    environment: []
+    networks:
+      - seanet
+    privileged: false
+  seafile:
+    cpu_shares: 90
+    command: []
+    container_name: seafile
+    depends_on:
+      db:
+        condition: service_started
+        required: true
+      memcached:
+        condition: service_started
+        required: true
+    deploy:
+      resources:
+        limits:
+          memory: 11705M
+    environment:
+      - DB_HOST=db
+      - DB_ROOT_PASSWD=db_dev
+      - SEAFILE_ADMIN_EMAIL=me@example.com
+      - SEAFILE_ADMIN_PASSWORD=asecret
+      - SEAFILE_SERVER_HOSTNAME=seaserver.local
+      - SEAFILE_SERVER_LETSENCRYPT=false
+      - TIME_ZONE=America/Sao_Paulo
+    hostname: seafile
+    image: seafileltd/seafile-mc:10.0-latest
+    labels:
+      icon: https://manual.seafile.com/latest/media/seafile-transparent-1024.png
+    ports:
+      - target: 80
+        published: "8080"
+        protocol: tcp
+      - target: 8082
+        published: "8082"
+        protocol: tcp
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: /media/devmon/sdb2-ata-WDC_WD10SPZX-21Z/seafile
+        target: /shared
+    devices: []
+    cap_add: []
+    networks:
+      - seanet
+    privileged: false
+networks:
+  seanet:
+    driver: bridge
+x-casaos:
+  author: Danilo
+  category: Storage-sharing
+  hostname: ""
+  icon: https://manual.seafile.com/latest/media/seafile-transparent-1024.png
+  index: /
+  is_uncontrolled: false
+  port_map: "8080"
+  scheme: http
+  store_app_id: DaniloX0
+  title:
+    custom: SeaFile
+    en_us: Seafile_Server
